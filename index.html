@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prograver — Калькулятор вартості</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
+.container{max-width:720px;margin:0 auto}
+.header{display:flex;align-items:center;gap:14px;margin-bottom:2rem}
+.logo{width:44px;height:44px;background:#1D9E75;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;letter-spacing:0.5px;flex-shrink:0}
+.header-text h1{font-size:20px;font-weight:600;color:#1a1a1a}
+.header-text p{font-size:13px;color:#666;margin-top:2px}
+.tabs{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid #ddd;border-radius:10px;overflow:hidden;background:#fff}
+.tab{flex:1;padding:10px 6px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:#888;background:#fff;border:none;transition:background 0.15s,color 0.15s}
+.tab.active{background:#f0f0ea;color:#1a1a1a}
+.tab:not(:last-child){border-right:1px solid #ddd}
+.section{display:none}
+.section.active{display:block}
+.card{background:#fff;border-radius:12px;border:1px solid #e8e8e8;padding:1.25rem;margin-bottom:1rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.field input,.field select{padding:9px 11px;font-size:14px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;width:100%;outline:none;transition:border-color 0.15s}
+.field input:focus,.field select:focus{border-color:#1D9E75}
+.divider{height:1px;background:#f0f0ea;margin:16px 0}
+.section-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px}
+.hint-box{font-size:12px;color:#555;background:#f0f9f5;border:1px solid #c8e8d8;border-radius:8px;padding:8px 12px;margin-bottom:12px;line-height:1.5;display:none}
+.result-box{background:#f5f5f0;border-radius:12px;padding:1.25rem;margin-top:1.25rem}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px}
+.result-row .rl{color:#666}
+.result-row .rv{font-weight:600;color:#1a1a1a}
+.sep{height:1px;background:#e0e0d8;margin:8px 0}
+.final-price{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding:14px 18px;background:#fff;border-radius:10px;border:2px solid #1D9E75}
+.final-price .fl{font-size:14px;font-weight:600;color:#666}
+.final-price .fp{font-size:30px;font-weight:700;color:#0F6E56}
+.min-note{font-size:11px;color:#999;margin-top:6px;text-align:right}
+.upsell-box{margin-top:12px;padding:12px 14px;background:#fff;border:1px solid #e8e8e8;border-radius:10px}
+.upsell-title{font-size:12px;font-weight:700;color:#1D9E75;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px}
+.upsell-items{display:flex;flex-direction:column;gap:6px}
+.upsell-item{display:flex;justify-content:space-between;font-size:13px;color:#555}
+.upsell-item span:last-child{font-weight:600;color:#1a1a1a}
+.pl-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.pl-card h3{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:10px}
+.pl-row{display:flex;justify-content:space-between;font-size:13px;color:#555;padding:3px 0}
+.pl-row span:last-child{font-weight:600;color:#1a1a1a}
+.pl-note{font-size:11px;color:#999;margin-top:6px}
+.coeff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.coeff-grid{grid-template-columns:1fr}}
+.coeff-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:12px 14px}
+.coeff-card h3{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:10px}
+.coeff-row{display:flex;justify-content:space-between;font-size:13px;color:#555;padding:3px 0}
+.coeff-row span:last-child{font-weight:700;color:#1a1a1a;background:#f0f0ea;padding:1px 8px;border-radius:5px;font-size:12px}
+.formula-box{background:#f0f9f5;border:1px solid #c8e8d8;border-radius:10px;padding:12px 14px;font-size:13px;color:#0F6E56;line-height:1.9;font-weight:600}
+.scripts-list{display:flex;flex-direction:column;gap:10px}
+.script-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px 16px}
+.script-tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:5px;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px}
+.tag-q{background:#e8f0fe;color:#1a56db}
+.tag-u{background:#e8f5e9;color:#2e7d32}
+.tag-c{background:#fff3e0;color:#e65100}
+.script-text{font-size:14px;color:#333;line-height:1.65}
+.packages{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:1rem}
+@media(max-width:480px){.packages{grid-template-columns:1fr}}
+.pkg{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px 16px}
+.pkg.featured{border:2px solid #1D9E75}
+.pkg h3{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:3px}
+.pkg-price{font-size:11px;color:#999;margin-bottom:10px}
+.pkg-items{font-size:13px;color:#555;display:flex;flex-direction:column;gap:5px}
+.pkg-item::before{content:"+ ";color:#1D9E75;font-weight:700}
+.badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:5px;background:#e8f5e9;color:#2e7d32;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px}
+footer{text-align:center;font-size:12px;color:#bbb;margin-top:2rem;padding-top:1rem;border-top:1px solid #e8e8e8}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="logo">PG</div>
+  <div class="header-text">
+    <h1>Prograver — калькулятор вартості</h1>
+    <p>Внутрішній інструмент · мінімальний чек 400 грн · ставка 20 грн/хв</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('calc',this)">Калькулятор</button>
+  <button class="tab" onclick="showTab('pricelist',this)">Прайс-лист</button>
+  <button class="tab" onclick="showTab('coeffs',this)">Коефіцієнти</button>
+  <button class="tab" onclick="showTab('scripts',this)">Скрипти</button>
+</div>
+
+<!-- ===== КАЛЬКУЛЯТОР ===== -->
+<div id="tab-calc" class="section active">
+  <div class="card">
+    <div class="section-label">Тип роботи та матеріал</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Тип роботи</label>
+        <select id="workType" onchange="updateWorkType()">
+          <option value="engrave">Лазерне гравірування</option>
+          <option value="cut">Лазерна різка</option>
+          <option value="sign">Таблички / шильди</option>
+          <option value="stamp">Печатки / штампи</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Матеріал</label>
+        <select id="material" onchange="calcPrice()">
+          <option value="1.0">Фанера / дерево (×1.0)</option>
+          <option value="1.2">Акрил (×1.2)</option>
+          <option value="1.5">Метал / алюміній (×1.5)</option>
+          <option value="2.0">Нерж. сталь (×2.0)</option>
+          <option value="2.5">Латунь / бронза (×2.5)</option>
+          <option value="1.3">Гума / флеш (штамп) (×1.3)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint-box" id="hint-box"></div>
+
+    <!-- Гравіровка -->
+    <div id="engrave-fields">
+      <div class="grid2">
+        <div class="field">
+          <label>Час гравірування (хв)</label>
+          <input type="number" id="minutes" value="10" min="1" oninput="calcPrice()">
+        </div>
+        <div class="field">
+          <label>Ставка за хвилину (грн)</label>
+          <input type="number" id="rate" value="20" min="5" oninput="calcPrice()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Різка -->
+    <div id="cut-fields" style="display:none">
+      <div class="grid2">
+        <div class="field">
+          <label>Метри різу (м)</label>
+          <input type="number" id="meters" value="2" min="0.1" step="0.1" oninput="calcPrice()">
+        </div>
+        <div class="field">
+          <label>Ставка за метр (грн)</label>
+          <input type="number" id="cutRate" value="20" min="5" oninput="calcPrice()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Таблички -->
+    <div id="sign-fields" style="display:none">
+      <div class="grid2">
+        <div class="field">
+          <label>Собівартість матеріалу (грн)</label>
+          <input type="number" id="matCost" value="80" min="0" oninput="calcPrice()">
+        </div>
+        <div class="field">
+          <label>Вартість роботи (грн)</label>
+          <input type="number" id="workCost" value="150" min="0" oninput="calcPrice()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Печатки -->
+    <div id="stamp-fields" style="display:none">
+      <div class="grid3">
+        <div class="field">
+          <label>Розмір кліше</label>
+          <select id="stampSize" onchange="calcPrice()">
+            <option value="120">до 20×20 мм</option>
+            <option value="160" selected>20×40 мм</option>
+            <option value="200">40×60 мм</option>
+            <option value="260">60×80 мм</option>
+            <option value="320">80×100 мм</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Тип оснастки</label>
+          <select id="stampBase" onchange="calcPrice()">
+            <option value="0">Без оснастки (0 грн)</option>
+            <option value="120">Самонабірна (120 грн)</option>
+            <option value="180" selected>Стандартна (180 грн)</option>
+            <option value="280">Преміум (280 грн)</option>
+            <option value="450">Металева (450 грн)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Кількість кольорів</label>
+          <select id="stampColors" onchange="calcPrice()">
+            <option value="1.0">1 колір (×1.0)</option>
+            <option value="1.3">2 кольори (×1.3)</option>
+            <option value="1.6">3+ кольори (×1.6)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Параметри замовлення</div>
+    <div class="grid3">
+      <div class="field">
+        <label>Кількість (шт)</label>
+        <input type="number" id="qty" value="1" min="1" oninput="calcPrice()">
+      </div>
+      <div class="field">
+        <label>Складність</label>
+        <select id="complexity" onchange="calcPrice()">
+          <option value="1.0">Проста (×1.0)</option>
+          <option value="1.3" selected>Середня (×1.3)</option>
+          <option value="1.6">Складна (×1.6)</option>
+          <option value="2.0">Дуже складна (×2.0)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Терміновість</label>
+        <select id="urgency" onchange="calcPrice()">
+          <option value="1.0">Стандарт (×1.0)</option>
+          <option value="1.3">Швидко (×1.3)</option>
+          <option value="1.5">На завтра (×1.5)</option>
+          <option value="2.0">Сьогодні (×2.0)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Тип клієнта</label>
+        <select id="clientType" onchange="calcPrice()">
+          <option value="1.2">Новий клієнт (×1.2)</option>
+          <option value="1.0" selected>Постійний (×1.0)</option>
+          <option value="0.9">Великий B2B (×0.9)</option>
+          <option value="0.8">VIP / партнер (×0.8)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Дизайн</label>
+        <select id="design" onchange="calcPrice()">
+          <option value="0">Не потрібен (0 грн)</option>
+          <option value="100">Готовий файл (100 грн)</option>
+          <option value="200">Простий дизайн (200 грн)</option>
+          <option value="500">Складний дизайн (500 грн)</option>
+          <option value="1000">Преміум дизайн (1000 грн)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="field">
+        <label>Підготовка файлу</label>
+        <select id="filePrep" onchange="calcPrice()">
+          <option value="0">Не потрібна (0 грн)</option>
+          <option value="50">Мінімальна (50 грн)</option>
+          <option value="150">Стандартна (150 грн)</option>
+          <option value="300">Складна (300 грн)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Пробний запуск</label>
+        <select id="testRun" onchange="calcPrice()">
+          <option value="0">Не потрібен (0 грн)</option>
+          <option value="50">Є (50 грн)</option>
+          <option value="100">Складний (100 грн)</option>
+          <option value="200">Дорогий матеріал (200 грн)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Упаковка</label>
+        <select id="packaging" onchange="calcPrice()">
+          <option value="0">Без упаковки (0 грн)</option>
+          <option value="20">Проста (20 грн)</option>
+          <option value="50">Стандартна (50 грн)</option>
+          <option value="100">Преміум (100 грн)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-box">
+    <div class="section-label">Розрахунок</div>
+    <div id="result-rows"></div>
+    <div class="final-price">
+      <span class="fl">Вартість замовлення</span>
+      <span class="fp" id="final-price">0 грн</span>
+    </div>
+    <div class="min-note" id="min-note"></div>
+    <div class="upsell-box" id="upsell-box" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===== ПРАЙС-ЛИСТ ===== -->
+<div id="tab-pricelist" class="section">
+  <div class="pl-card">
+    <h3>Лазерне гравірування</h3>
+    <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
+    <div class="pl-row"><span>Фанера / дерево</span><span>від 400 грн</span></div>
+    <div class="pl-row"><span>Акрил</span><span>від 480 грн</span></div>
+    <div class="pl-row"><span>Метал (алюміній)</span><span>від 600 грн</span></div>
+    <div class="pl-row"><span>Нерж. сталь</span><span>від 800 грн</span></div>
+    <div class="pl-row"><span>Латунь / бронза</span><span>від 1 000 грн</span></div>
+    <div class="pl-note">Ціна залежить від складності, тиражу та терміновості</div>
+  </div>
+  <div class="pl-card">
+    <h3>Лазерна різка</h3>
+    <div class="pl-row"><span>Фанера (за метр різу)</span><span>від 20 грн/м</span></div>
+    <div class="pl-row"><span>Акрил (за метр різу)</span><span>від 24 грн/м</span></div>
+    <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
+    <div class="pl-row"><span>Тираж 50+ шт</span><span>знижка до 20%</span></div>
+  </div>
+  <div class="pl-card">
+    <h3>Таблички та шильди</h3>
+    <div class="pl-row"><span>Акрил стандарт</span><span>від 400 грн/шт</span></div>
+    <div class="pl-row"><span>Метал (алюміній)</span><span>від 500 грн/шт</span></div>
+    <div class="pl-row"><span>Нерж. сталь / латунь</span><span>від 800 грн/шт</span></div>
+    <div class="pl-row"><span>Тираж 10+ шт</span><span>ціна знижується</span></div>
+  </div>
+  <div class="pl-card">
+    <h3>Печатки та штампи</h3>
+    <div class="pl-row"><span>Проста (до 20×20 мм)</span><span>від 400 грн</span></div>
+    <div class="pl-row"><span>Стандартна (20×40 мм)</span><span>від 500 грн</span></div>
+    <div class="pl-row"><span>Велика (40×60 мм)</span><span>від 650 грн</span></div>
+    <div class="pl-row"><span>Преміум оснастка</span><span>+180–450 грн</span></div>
+    <div class="pl-row"><span>Кольоровий відбиток</span><span>+30–60%</span></div>
+    <div class="pl-note">Термін виготовлення: 1–3 робочі дні</div>
+  </div>
+  <div class="pl-card">
+    <h3>Дизайн та підготовка</h3>
+    <div class="pl-row"><span>Готовий файл клієнта</span><span>100 грн</span></div>
+    <div class="pl-row"><span>Простий дизайн</span><span>200–300 грн</span></div>
+    <div class="pl-row"><span>Складний дизайн</span><span>500–1 000 грн</span></div>
+    <div class="pl-row"><span>Підготовка файлу</span><span>50–300 грн</span></div>
+  </div>
+  <div class="pl-card">
+    <h3>Терміновість</h3>
+    <div class="pl-row"><span>Стандарт (3–5 днів)</span><span>базова ціна</span></div>
+    <div class="pl-row"><span>Швидко (1–2 дні)</span><span>+30%</span></div>
+    <div class="pl-row"><span>На завтра</span><span>+50%</span></div>
+    <div class="pl-row"><span>Сьогодні / терміново</span><span>+100%</span></div>
+  </div>
+</div>
+
+<!-- ===== КОЕФІЦІЄНТИ ===== -->
+<div id="tab-coeffs" class="section">
+  <div class="coeff-grid">
+    <div class="coeff-card">
+      <h3>Складність K1</h3>
+      <div class="coeff-row"><span>Проста</span><span>×1.0</span></div>
+      <div class="coeff-row"><span>Середня</span><span>×1.3</span></div>
+      <div class="coeff-row"><span>Складна</span><span>×1.6</span></div>
+      <div class="coeff-row"><span>Дуже складна</span><span>×2.0</span></div>
+    </div>
+    <div class="coeff-card">
+      <h3>Тираж K2</h3>
+      <div class="coeff-row"><span>1 штука</span><span>×2.0</span></div>
+      <div class="coeff-row"><span>2–10 шт</span><span>×1.5</span></div>
+      <div class="coeff-row"><span>11–50 шт</span><span>×1.2</span></div>
+      <div class="coeff-row"><span>50+ шт</span><span>×1.0</span></div>
+    </div>
+    <div class="coeff-card">
+      <h3>Матеріал K3</h3>
+      <div class="coeff-row"><span>Фанера</span><span>×1.0</span></div>
+      <div class="coeff-row"><span>Акрил</span><span>×1.2</span></div>
+      <div class="coeff-row"><span>Гума / флеш</span><span>×1.3</span></div>
+      <div class="coeff-row"><span>Метал</span><span>×1.5</span></div>
+      <div class="coeff-row"><span>Нерж. сталь</span><span>×2.0</span></div>
+      <div class="coeff-row"><span>Латунь / бронза</span><span>×2.5</span></div>
+    </div>
+    <div class="coeff-card">
+      <h3>Терміновість K4</h3>
+      <div class="coeff-row"><span>Стандарт</span><span>×1.0</span></div>
+      <div class="coeff-row"><span>Швидко (1–2 дні)</span><span>×1.3</span></div>
+      <div class="coeff-ні"><span>На завтра</span><span>×1.5</span></div>
+      <div class="coeff-row"><span>Сьогодні</span><span>×2.0</span></div>
+    </div>
+    <div class="coeff-card">
+      <h3>Тип клієнта K5</h3>
+      <div class="coeff-row"><span>Новий</span><span>×1.2</span></div>
+      <div class="coeff-row"><span>Постійний</span><span>×1.0</span></div>
+      <div class="coeff-row"><span>Великий B2B</span><span>×0.9</span></div>
+      <div class="coeff-row"><span>VIP / партнер</span><span>×0.8</span></div>
+    </div>
+    <div class="coeff-card">
+      <h3>Формула</h3>
+      <div class="formula-box">
+        БАЗА × K1 × K2 × K3<br>× K4 × K5 + доплати<br>
+        <span style="color:#1D9E75">≥ мін. чек 400 грн</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== СКРИПТИ ===== -->
+<div id="tab-scripts" class="section">
+  <div class="scripts-list">
+    <div class="script-card">
+      <div class="script-tag tag-q">Питання про ціну</div>
+      <div class="script-text">"Підкажіть, будь ласка, кількість, матеріал і розмір — порахую точну вартість для вас."</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-q">Одинична замовлення</div>
+      <div class="script-text">"Для одного виробу ціна трохи вища — налаштування обладнання займає стільки ж часу. Якщо зробити 5 штук, ціна за одиницю буде значно нижча."</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-q">Питання про печатку</div>
+      <div class="script-text">"Підкажіть розмір кліше, яка оснастка вас цікавить — стандартна чи преміум — і чи потрібен кольоровий відбиток? Порахую точну вартість."</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-u">Апсейл: тираж</div>
+      <div class="script-text">"Якщо замовити 10 штук замість однієї — ціна за одиницю знижується майже вдвічі. Хочете, порахуємо?"</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-u">Апсейл: матеріал</div>
+      <div class="script-text">"Можемо зробити у фанері або в акрилі — виглядає набагато солідніше, різниця в ціні невелика. Показати варіанти?"</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-u">Апсейл: оснастка для штампу</div>
+      <div class="script-text">"До кліше можна взяти преміум оснастку — вона служить набагато довше і виглядає солідно. Різниця лише 100 грн."</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-u">Апсейл: дизайн</div>
+      <div class="script-text">"Якщо хочете — наш дизайнер підготує файл під замовлення. 200 грн, але результат буде значно кращим."</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-c">Закриття угоди</div>
+      <div class="script-text">"Є два варіанти: стандартний — 3–5 днів, і терміновий — до завтра з доплатою 50%. Який зручніший?"</div>
+    </div>
+    <div class="script-card">
+      <div class="script-tag tag-c">Якщо дорого</div>
+      <div class="script-text">"Розумію. Можемо підібрати — наприклад, обрати матеріал простіше або збільшити партію. Давайте разом знайдемо оптимальний варіант."</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-label">Пакети продажу</div>
+    <div class="packages">
+      <div class="pkg">
+        <h3>Basic</h3>
+        <div class="pkg-price">базова ціна</div>
+        <div class="pkg-items">
+          <div class="pkg-item">тільки робота</div>
+          <div class="pkg-item">стандартний термін</div>
+        </div>
+      </div>
+      <div class="pkg featured">
+        <div class="badge">рекомендується</div>
+        <h3>Standard</h3>
+        <div class="pkg-price">+25–35% до ціни</div>
+        <div class="pkg-items">
+          <div class="pkg-item">робота</div>
+          <div class="pkg-item">дизайн / підготовка</div>
+          <div class="pkg-item">просте пакування</div>
+        </div>
+      </div>
+      <div class="pkg">
+        <h3>Premium</h3>
+        <div class="pkg-price">+70–110% до ціни</div>
+        <div class="pkg-items">
+          <div class="pkg-item">робота</div>
+          <div class="pkg-item">преміум дизайн</div>
+          <div class="pkg-item">преміум упаковка</div>
+          <div class="pkg-item">терміново</div>
+          <div class="pkg-item">преміум матеріал</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Prograver.ua · Внутрішній калькулятор · 2025</footer>
+
+</div><!-- /container -->
+
+<script>
+var MIN_PRICE = 400;
+var HINTS = {
+  engrave:'База = хвилини × ставка. Підходить для гравірування на будь-якому матеріалі.',
+  cut:'База = метри різу × ставка. Фанера від 20 грн/м, акрил від 24 грн/м.',
+  sign:'База = собівартість матеріалу + вартість роботи. Коефіцієнти множаться на суму.',
+  stamp:'База = вартість кліше + оснастка × кольори. Коефіцієнти множаться далі.'
+};
+
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function updateWorkType(){
+  var wt=document.getElementById('workType').value;
+  document.getElementById('engrave-fields').style.display=wt==='engrave'?'':'none';
+  document.getElementById('cut-fields').style.display=wt==='cut'?'':'none';
+  document.getElementById('sign-fields').style.display=wt==='sign'?'':'none';
+  document.getElementById('stamp-fields').style.display=wt==='stamp'?'':'none';
+  var hb=document.getElementById('hint-box');
+  hb.textContent=HINTS[wt]||'';
+  hb.style.display=HINTS[wt]?'block':'none';
+  if(wt==='stamp') document.getElementById('material').value='1.3';
+  else document.getElementById('material').value='1.0';
+  calcPrice();
+}
+
+function getQtyCoeff(q){
+  if(q<=1)return 2.0;
+  if(q<=10)return 1.5;
+  if(q<=50)return 1.2;
+  return 1.0;
+}
+function qtyLabel(q){
+  if(q<=1)return '1 шт (×2.0)';
+  if(q<=10)return q+' шт (×1.5)';
+  if(q<=50)return q+' шт (×1.2)';
+  return q+' шт (×1.0)';
+}
+
+function calcPrice(){
+  var wt=document.getElementById('workType').value;
+  var mat=parseFloat(document.getElementById('material').value);
+  var k1=parseFloat(document.getElementById('complexity').value);
+  var qty=parseInt(document.getElementById('qty').value)||1;
+  var k2=getQtyCoeff(qty);
+  var k4=parseFloat(document.getElementById('urgency').value);
+  var k5=parseFloat(document.getElementById('clientType').value);
+  var design=parseInt(document.getElementById('design').value)||0;
+  var filePrep=parseInt(document.getElementById('filePrep').value)||0;
+  var testRun=parseInt(document.getElementById('testRun').value)||0;
+  var pkg=parseInt(document.getElementById('packaging').value)||0;
+
+  var base=0;
+  if(wt==='engrave'){
+    base=(parseFloat(document.getElementById('minutes').value)||0)*(parseFloat(document.getElementById('rate').value)||20);
+  } else if(wt==='cut'){
+    base=(parseFloat(document.getElementById('meters').value)||0)*(parseFloat(document.getElementById('cutRate').value)||20);
+  } else if(wt==='sign'){
+    base=(parseFloat(document.getElementById('matCost').value)||0)+(parseFloat(document.getElementById('workCost').value)||0);
+  } else if(wt==='stamp'){
+    var klishe=parseInt(document.getElementById('stampSize').value)||160;
+    var osnastka=parseInt(document.getElementById('stampBase').value)||180;
+    var colK=parseFloat(document.getElementById('stampColors').value)||1.0;
+    base=(klishe+osnastka)*colK;
+  }
+
+  var subtotal=base*k1*k2*mat*k4*k5;
+  var extras=design+filePrep+testRun+pkg;
+  var total=subtotal+extras;
+  var finalPrice=Math.max(total,MIN_PRICE);
+  var wasMin=total<MIN_PRICE&&total>0;
+
+  var rows=document.getElementById('result-rows');
+  rows.innerHTML=
+    '<div class="result-row"><span class="rl">База розрахунку</span><span class="rv">'+Math.round(base)+' грн</span></div>'+
+    '<div class="result-row"><span class="rl">Складність K1 (×'+k1+')</span><span class="rv"></span></div>'+
+    '<div class="result-row"><span class="rl">Тираж K2 ('+qtyLabel(qty)+')</span><span class="rv"></span></div>'+
+    '<div class="result-row"><span class="rl">Матеріал K3 (×'+mat+')</span><span class="rv"></span></div>'+
+    '<div class="result-row"><span class="rl">Терміновість K4 (×'+k4+')</span><span class="rv"></span></div>'+
+    '<div class="result-row"><span class="rl">Клієнт K5 (×'+k5+')</span><span class="rv">= '+Math.round(subtotal)+' грн</span></div>'+
+    (extras>0?'<div class="result-row"><span class="rl">Доплати (дизайн, файл, упак.)</span><span class="rv">+ '+extras+' грн</span></div>':'')+
+    '<div class="sep"></div>'+
+    '<div class="result-row"><span class="rl">Розрахункова сума</span><span class="rv">'+Math.round(total)+' грн</span></div>';
+
+  document.getElementById('final-price').textContent=Math.round(finalPrice).toLocaleString('uk-UA')+' грн';
+  document.getElementById('min-note').textContent=wasMin?'* Застосовано мінімальний чек 400 грн':'';
+
+  var ub=document.getElementById('upsell-box');
+  var tips=[];
+  if(qty<5) tips.push(['Замовте 5 шт — ціна за шт значно нижче','']);
+  if(k4<1.3) tips.push(['Терміново (на завтра)','+50%']);
+  if(design<200) tips.push(['Додати дизайн','+200 грн']);
+  if(pkg===0) tips.push(['Подарункова упаковка','+50 грн']);
+  if(mat<1.5&&wt!=='stamp') tips.push(['Upgrade матеріал до металу','ціна ×1.5']);
+  if(wt==='stamp'&&parseInt(document.getElementById('stampBase').value)<280) tips.push(['Преміум оснастка для штампу','+100–170 грн']);
+
+  if(tips.length>0){
+    ub.innerHTML='<div class="upsell-title">Запропонуйте клієнту:</div><div class="upsell-items">'+
+      tips.map(function(t){return'<div class="upsell-item"><span>'+t[0]+'</span><span>'+t[1]+'</span></div>'}).join('')+
+    '</div>';
+    ub.style.display='';
+  } else {
+    ub.style.display='none';
+  }
+}
+
+updateWorkType();
+</script>
+</body>
+</html>
