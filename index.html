@@ -148,7 +148,7 @@ footer span{color:#cc0000}
         <div id="engrave-fields">
           <div class="grid2">
             <div class="field">
-              <label>Час гравірування (хв)</label>
+              <label>Час гравірування на 1 шт (хв)</label>
               <input type="number" id="minutes" value="10" min="1" oninput="calcPrice()">
             </div>
             <div class="field">
@@ -301,17 +301,6 @@ footer span{color:#cc0000}
             </select>
           </div>
         </div>
-        <div class="grid2">
-          <div class="field">
-            <label>Упаковка</label>
-            <select id="packaging" onchange="calcPrice()">
-              <option value="0">Без упаковки (0 грн)</option>
-              <option value="20">Проста (20 грн)</option>
-              <option value="50">Стандартна (50 грн)</option>
-              <option value="100">Преміум (100 грн)</option>
-            </select>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -399,11 +388,14 @@ footer span{color:#cc0000}
       <div class="coeff-row"><span>Дуже складна</span><span>×2.0</span></div>
     </div>
     <div class="coeff-card">
-      <h3>Тираж K2</h3>
-      <div class="coeff-row"><span>1 штука</span><span>×2.0</span></div>
-      <div class="coeff-row"><span>2–10 шт</span><span>×1.5</span></div>
-      <div class="coeff-row"><span>11–50 шт</span><span>×1.2</span></div>
-      <div class="coeff-row"><span>50+ шт</span><span>×1.0</span></div>
+      <h3>Знижка тиражу K2</h3>
+      <div class="coeff-row"><span>1 шт</span><span>−0%</span></div>
+      <div class="coeff-row"><span>2–5 шт</span><span>−10%</span></div>
+      <div class="coeff-row"><span>6–10 шт</span><span>−15%</span></div>
+      <div class="coeff-row"><span>11–25 шт</span><span>−20%</span></div>
+      <div class="coeff-row"><span>26–50 шт</span><span>−30%</span></div>
+      <div class="coeff-row"><span>51–100 шт</span><span>−40%</span></div>
+      <div class="coeff-row"><span>100+ шт</span><span>−50%</span></div>
     </div>
     <div class="coeff-card">
       <h3>Матеріал K3</h3>
@@ -498,7 +490,6 @@ footer span{color:#cc0000}
         <div class="pkg-items">
           <div class="pkg-item">робота</div>
           <div class="pkg-item">дизайн / підготовка</div>
-          <div class="pkg-item">просте пакування</div>
         </div>
       </div>
       <div class="pkg">
@@ -507,7 +498,6 @@ footer span{color:#cc0000}
         <div class="pkg-items">
           <div class="pkg-item">робота</div>
           <div class="pkg-item">преміум дизайн</div>
-          <div class="pkg-item">преміум упаковка</div>
           <div class="pkg-item">терміново</div>
           <div class="pkg-item">преміум матеріал</div>
         </div>
@@ -578,16 +568,22 @@ function updateWorkType(){
 }
 
 function getQtyCoeff(q){
-  if(q<=1)return 2.0;
-  if(q<=10)return 1.5;
-  if(q<=50)return 1.2;
-  return 1.0;
+  if(q<=1)return 1.0;
+  if(q<=5)return 0.9;
+  if(q<=10)return 0.85;
+  if(q<=25)return 0.8;
+  if(q<=50)return 0.7;
+  if(q<=100)return 0.6;
+  return 0.5;
 }
 function qtyLabel(q){
-  if(q<=1)return '1 шт (×2.0)';
-  if(q<=10)return q+' шт (×1.5)';
-  if(q<=50)return q+' шт (×1.2)';
-  return q+' шт (×1.0)';
+  if(q<=1)return '1 шт (без знижки)';
+  if(q<=5)return q+' шт (−10%)';
+  if(q<=10)return q+' шт (−15%)';
+  if(q<=25)return q+' шт (−20%)';
+  if(q<=50)return q+' шт (−30%)';
+  if(q<=100)return q+' шт (−40%)';
+  return q+' шт (−50%)';
 }
 
 function calcPrice(){
@@ -599,11 +595,14 @@ function calcPrice(){
   var k4=parseFloat(document.getElementById('urgency').value);
   var k5=parseFloat(document.getElementById('clientType').value);
   var design=parseInt(document.getElementById('design').value)||0;
-  var pkg=parseInt(document.getElementById('packaging').value)||0;
 
   var base=0;
+  var totalMins=0;
   if(wt==='engrave'){
-    base=(parseFloat(document.getElementById('minutes').value)||0)*(parseFloat(document.getElementById('rate').value)||15);
+    var mins=parseFloat(document.getElementById('minutes').value)||0;
+    var rate=parseFloat(document.getElementById('rate').value)||15;
+    totalMins=mins*qty;
+    base=totalMins*rate;
   } else if(wt==='cut'){
     base=(parseFloat(document.getElementById('meters').value)||0)*(parseFloat(document.getElementById('cutRate').value)||20);
   } else if(wt==='sign'){
@@ -624,20 +623,25 @@ function calcPrice(){
   }
 
   var subtotal=base*k1*k2*mat*k4*k5;
-  var extras=design+pkg;
+  var extras=design;
   var total=subtotal+extras;
   var finalPrice=Math.max(total,MIN_PRICE);
   var wasMin=total<MIN_PRICE&&total>0;
 
   var rows=document.getElementById('result-rows');
+  var engraveInfo = (wt==='engrave' && qty>1)
+    ? '<div class="result-row"><span class="rl">Загальний час ('+qty+' шт × '+(parseFloat(document.getElementById('minutes').value)||0)+' хв)</span><span class="rv">'+totalMins+' хв</span></div>'
+    : '';
   rows.innerHTML=
+    engraveInfo+
     '<div class="result-row"><span class="rl">База розрахунку</span><span class="rv">'+Math.round(base)+' грн</span></div>'+
     '<div class="result-row"><span class="rl">Складність K1 (×'+k1+')</span><span class="rv"></span></div>'+
-    '<div class="result-row"><span class="rl">Тираж K2 ('+qtyLabel(qty)+')</span><span class="rv"></span></div>'+
+    '<div class="result-row"><span class="rl">Знижка тиражу K2 ('+qtyLabel(qty)+')</span><span class="rv"></span></div>'+
     (wt!=='uv'?'<div class="result-row"><span class="rl">Матеріал K3 (×'+mat+')</span><span class="rv"></span></div>':'')+
     '<div class="result-row"><span class="rl">Терміновість K4 (×'+k4+')</span><span class="rv"></span></div>'+
     '<div class="result-row"><span class="rl">Клієнт K5 (×'+k5+')</span><span class="rv">= '+Math.round(subtotal)+' грн</span></div>'+
-    (extras>0?'<div class="result-row"><span class="rl">Доплати (дизайн, упак.)</span><span class="rv">+ '+extras+' грн</span></div>':'')+
+    (qty>1&&wt==='engrave'?'<div class="result-row"><span class="rl">Ціна за 1 шт</span><span class="rv">'+Math.round(subtotal/qty)+' грн</span></div>':'')+
+    (extras>0?'<div class="result-row"><span class="rl">Доплати (дизайн)</span><span class="rv">+ '+extras+' грн</span></div>':'')+
     '<div class="sep"></div>'+
     '<div class="result-row"><span class="rl">Розрахункова сума</span><span class="rv">'+Math.round(total)+' грн</span></div>';
 
@@ -649,7 +653,6 @@ function calcPrice(){
   if(qty<5) tips.push(['Замовте 5 шт — ціна за шт значно нижче','']);
   if(k4<2.0) tips.push(['Терміново (на завтра / сьогодні)','+100%']);
   if(design<200) tips.push(['Додати дизайн','+200 грн']);
-  if(pkg===0) tips.push(['Подарункова упаковка','+50 грн']);
   if(mat<1.5&&wt!=='stamp'&&wt!=='uv') tips.push(['Upgrade матеріал до металу','ціна ×1.5']);
   if(wt==='stamp'&&parseInt(document.getElementById('stampBase').value)<280) tips.push(['Преміум оснастка для штампу','+100–170 грн']);
 
