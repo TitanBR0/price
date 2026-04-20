@@ -132,13 +132,28 @@ footer span{color:#cc0000}
             <select id="material" onchange="calcPrice()">
               <option value="1.0">Фанера / дерево (×1.0)</option>
               <option value="1.2">Акрил (×1.2)</option>
-              <option value="1.5">Метал / алюміній (×1.5)</option>
+              <option value="1.5">Алюміній (×1.5)</option>
               <option value="2.0">Нерж. сталь (×2.0)</option>
               <option value="2.0">Скло (×2.0)</option>
               <option value="2.5">Латунь / бронза (×2.5)</option>
               <option value="3.0">Золото / Срібло (×3.0)</option>
               <option value="1.3">Гума / флеш (штамп) (×1.3)</option>
               <option value="1.8">Гума / Силікон / Софт-тач (×1.8)</option>
+            </select>
+          </div>
+          <div class="field" id="sign-mat-field" style="display:none">
+            <label>Матеріал</label>
+            <select id="signMatRate" onchange="calcPrice()">
+              <option value="1.00">Алюміній 1 мм (1.00 грн/см²)</option>
+              <option value="1.00">Алюміній 2 мм (1.00 грн/см²)</option>
+              <option value="0.90">Нерж. сталь 1 мм (0.90 грн/см²)</option>
+              <option value="1.20">Нерж. сталь 2 мм (1.20 грн/см²)</option>
+              <option value="1.50">Латунь / бронза (1.50 грн/см²)</option>
+              <option value="0.40">Акрил 3 мм (0.40 грн/см²)</option>
+              <option value="0.55">Акрил 5 мм (0.55 грн/см²)</option>
+              <option value="0.70">Акрил 8 мм (0.70 грн/см²)</option>
+              <option value="0.30">Фанера 4 мм (0.30 грн/см²)</option>
+              <option value="0.35">Фанера 6 мм (0.35 грн/см²)</option>
             </select>
           </div>
         </div>
@@ -179,16 +194,34 @@ footer span{color:#cc0000}
         </div>
 
         <div id="sign-fields" style="display:none">
-          <div class="grid2">
+          <div class="grid3">
             <div class="field">
-              <label>Собівартість матеріалу (грн)</label>
-              <input type="number" id="matCost" value="80" min="0" oninput="calcPrice()">
+              <label>Ширина (мм)</label>
+              <input type="number" id="signW" value="200" min="10" oninput="calcPrice()">
             </div>
             <div class="field">
-              <label>Вартість роботи (грн)</label>
-              <input type="number" id="workCost" value="150" min="0" oninput="calcPrice()">
+              <label>Висота (мм)</label>
+              <input type="number" id="signH" value="100" min="10" oninput="calcPrice()">
+            </div>
+            <div class="field">
+              <label>Площа (см²)</label>
+              <input type="number" id="signArea" readonly style="background:#f0f0f0;color:#888;cursor:default">
             </div>
           </div>
+          <div class="grid2">
+            <div class="field">
+              <label>Ставка роботи (грн/см²)</label>
+              <input type="number" id="signWorkRate" value="0.50" min="0.01" step="0.01" oninput="calcPrice()">
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:#f9f9f9;border:1px solid #eee;border-left:3px solid #cc0000;border-radius:6px;margin-bottom:14px">
+            <input type="checkbox" id="adhesive" onchange="calcPrice()" style="margin-top:3px;width:16px;height:16px;accent-color:#cc0000;flex-shrink:0">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#1a1a1a">Клейка основа (самоклейка)</div>
+              <div style="font-size:12px;color:#888;margin-top:2px">Додає вартість матеріалу + роботи з нанесення · +0.15 грн/см²</div>
+            </div>
+          </div>
+          <div id="sign-calc-hint" style="font-size:12px;color:#888;background:#f9f9f9;border:1px solid #eee;border-radius:6px;padding:8px 12px;margin-bottom:14px"></div>
         </div>
 
         <div id="stamp-fields" style="display:none">
@@ -333,7 +366,7 @@ footer span{color:#cc0000}
       <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
       <div class="pl-row"><span>Фанера / дерево</span><span>від 400 грн</span></div>
       <div class="pl-row"><span>Акрил</span><span>від 480 грн</span></div>
-      <div class="pl-row"><span>Метал (алюміній)</span><span>від 600 грн</span></div>
+      <div class="pl-row"><span>Алюміній</span><span>від 600 грн</span></div>
       <div class="pl-row"><span>Нерж. сталь / Скло</span><span>від 800 грн</span></div>
       <div class="pl-row"><span>Латунь / бронза</span><span>від 1 000 грн</span></div>
       <div class="pl-row"><span>Гума / Силікон / Софт-тач</span><span>від 550 грн</span></div>
@@ -350,7 +383,7 @@ footer span{color:#cc0000}
     <div class="pl-card">
       <h3>Таблички та шильди</h3>
       <div class="pl-row"><span>Акрил стандарт</span><span>від 400 грн/шт</span></div>
-      <div class="pl-row"><span>Метал (алюміній)</span><span>від 500 грн/шт</span></div>
+      <div class="pl-row"><span>Алюміній</span><span>від 500 грн/шт</span></div>
       <div class="pl-row"><span>Нерж. сталь / латунь</span><span>від 800 грн/шт</span></div>
       <div class="pl-row"><span>Тираж 10+ шт</span><span>ціна знижується</span></div>
     </div>
@@ -407,7 +440,7 @@ footer span{color:#cc0000}
       <div class="coeff-row"><span>Фанера</span><span>×1.0</span></div>
       <div class="coeff-row"><span>Акрил</span><span>×1.2</span></div>
       <div class="coeff-row"><span>Гума / флеш</span><span>×1.3</span></div>
-      <div class="coeff-row"><span>Метал</span><span>×1.5</span></div>
+      <div class="coeff-row"><span>Алюміній</span><span>×1.5</span></div>
       <div class="coeff-row"><span>Гума / Силікон / Софт-тач</span><span>×1.8</span></div>
       <div class="coeff-row"><span>Нерж. сталь / Скло</span><span>×2.0</span></div>
       <div class="coeff-row"><span>Латунь / бронза</span><span>×2.5</span></div>
@@ -520,7 +553,7 @@ var MIN_PRICE=400;
 var HINTS={
   engrave:'База = хвилини × ставка. Підходить для гравірування на будь-якому матеріалі.',
   cut:'База = метри різу × ставка. Фанера від 20 грн/м, акрил від 24 грн/м.',
-  sign:'База = собівартість матеріалу + вартість роботи. Коефіцієнти множаться на суму.',
+  sign:'База = (ставка матеріалу + ставка роботи) × площа дм² × кількість. Введіть розмір у мм.',
   stamp:'База = вартість кліше + оснастка × кольори. Коефіцієнти множаться далі.',
   uv:'База = площа × ставка × шари × матеріал. Можна вводити в дм² або см².'
 };
@@ -564,7 +597,9 @@ function updateWorkType(){
   hb.textContent=HINTS[wt]||'';
   hb.style.display=HINTS[wt]?'block':'none';
   var mf=document.getElementById('material-field');
-  mf.style.display=wt==='uv'?'none':'';
+  var smf=document.getElementById('sign-mat-field');
+  mf.style.display=(wt==='uv'||wt==='sign')?'none':'';
+  smf.style.display=wt==='sign'?'':'none';
   if(wt==='stamp') document.getElementById('material').value='1.3';
   else document.getElementById('material').value='1.0';
   calcPrice();
@@ -612,7 +647,24 @@ function calcPrice(){
   } else if(wt==='cut'){
     base=(parseFloat(document.getElementById('meters').value)||0)*(parseFloat(document.getElementById('cutRate').value)||20);
   } else if(wt==='sign'){
-    base=(parseFloat(document.getElementById('matCost').value)||0)+(parseFloat(document.getElementById('workCost').value)||0);
+    var sw=parseFloat(document.getElementById('signW').value)||0;
+    var sh=parseFloat(document.getElementById('signH').value)||0;
+    var areaCm2=Math.round(sw*sh/100)/100;
+    document.getElementById('signArea').value=areaCm2.toFixed(1);
+    var signMatRate=parseFloat(document.getElementById('signMatRate').value)||0.40;
+    var signWorkRate=parseFloat(document.getElementById('signWorkRate').value)||0.50;
+    var adhesive=document.getElementById('adhesive').checked;
+    var adhesiveRate=adhesive?0.15:0;
+    var totalRate=signMatRate+signWorkRate+adhesiveRate;
+    var perUnit=areaCm2*totalRate;
+    base=perUnit*qty;
+    mat=1.0;
+    var hint=document.getElementById('sign-calc-hint');
+    hint.textContent='Площа: '+areaCm2.toFixed(1)+' см²'
+      +' · Матеріал: '+Math.round(areaCm2*signMatRate)+' грн'
+      +' · Робота: '+Math.round(areaCm2*signWorkRate)+' грн'
+      +(adhesive?' · Клейка: '+Math.round(areaCm2*adhesiveRate)+' грн':'')
+      +' · За 1 шт: '+Math.round(perUnit)+' грн';
   } else if(wt==='stamp'){
     var klishe=parseInt(document.getElementById('stampSize').value)||160;
     var osnastka=parseInt(document.getElementById('stampBase').value)||180;
@@ -679,6 +731,7 @@ function calcPrice(){
 updateUrgency();
 updateWorkType();
 document.getElementById('footer-year').textContent=new Date().getFullYear();
+document.getElementById('signArea').value=(200*100/100).toFixed(1);
 </script>
 </body>
 </html>
