@@ -651,7 +651,7 @@ function calcPrice(){
   } else if(wt==='sign'){
     var sw=parseFloat(document.getElementById('signW').value)||0;
     var sh=parseFloat(document.getElementById('signH').value)||0;
-    var areaCm2=Math.round(sw*sh/100)/100;
+    var areaCm2=Math.round(sw*sh/100*10)/10;
     document.getElementById('signArea').value=areaCm2.toFixed(1);
     var signMatRate=parseFloat(document.getElementById('signMatRate').value)||0.40;
     var signWorkRate=parseFloat(document.getElementById('signWorkRate').value)||0.50;
@@ -733,7 +733,7 @@ function calcPrice(){
 updateUrgency();
 updateWorkType();
 document.getElementById('footer-year').textContent=new Date().getFullYear();
-document.getElementById('signArea').value=(200*100/100).toFixed(1);
+document.getElementById('signArea').value=(200.0).toFixed(1);
 </script>
 </body>
 </html>
