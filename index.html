@@ -133,7 +133,7 @@ footer span{color:#cc0000}
             <label>Матеріал</label>
             <select id="material" onchange="calcPrice()">
               <option value="1.0">Фанера / дерево (×1.0)</option>
-              <option value="1.2">Акрил (×1.2)</option>
+              <option value="1.2">Пластик / Акрил (×1.2)</option>
               <option value="1.5">Алюміній (×1.5)</option>
               <option value="2.0">Нерж. сталь (×2.0)</option>
               <option value="2.0">Скло (×2.0)</option>
@@ -281,7 +281,7 @@ footer span{color:#cc0000}
             <div class="field">
               <label>Матеріал для УФ</label>
               <select id="uvMaterial" onchange="calcPrice()">
-                <option value="1.0">Акрил (×1.0)</option>
+                <option value="1.0">Пластик / Акрил (×1.0)</option>
                 <option value="1.0">Пластик / ПВХ (×1.0)</option>
                 <option value="1.2">Дерево / фанера (×1.2)</option>
               </select>
@@ -349,11 +349,16 @@ footer span{color:#cc0000}
       <div class="result-box">
         <div class="result-title">Розрахунок</div>
         <div id="result-rows"></div>
-        <div class="final-price-box">
+        <div class="final-price-box" id="price-card">
           <span class="fl">Вартість замовлення</span>
+          <div id="price-card-detail" style="font-size:13px;color:#999;margin:4px 0 6px;min-height:18px"></div>
           <div class="fp" id="final-price">0 <span>грн</span></div>
         </div>
         <div class="min-note" id="min-note"></div>
+        <button onclick="downloadPriceCard()" id="download-btn" style="margin-top:14px;width:100%;padding:10px;background:#cc0000;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Зберегти як зображення
+        </button>
         <div class="upsell-box" id="upsell-box" style="display:none"></div>
       </div>
     </div>
@@ -367,7 +372,7 @@ footer span{color:#cc0000}
       <h3>Лазерне гравірування</h3>
       <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
       <div class="pl-row"><span>Фанера / дерево</span><span>від 400 грн</span></div>
-      <div class="pl-row"><span>Акрил</span><span>від 480 грн</span></div>
+      <div class="pl-row"><span>Пластик / Акрил</span><span>від 480 грн</span></div>
       <div class="pl-row"><span>Алюміній</span><span>від 600 грн</span></div>
       <div class="pl-row"><span>Нерж. сталь / Скло</span><span>від 800 грн</span></div>
       <div class="pl-row"><span>Латунь / бронза</span><span>від 1 000 грн</span></div>
@@ -378,13 +383,13 @@ footer span{color:#cc0000}
     <div class="pl-card">
       <h3>Лазерна різка</h3>
       <div class="pl-row"><span>Фанера (за метр різу)</span><span>від 20 грн/м</span></div>
-      <div class="pl-row"><span>Акрил (за метр різу)</span><span>від 24 грн/м</span></div>
+      <div class="pl-row"><span>Пластик / Акрил (за метр різу)</span><span>від 24 грн/м</span></div>
       <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
       <div class="pl-row"><span>Тираж 50+ шт</span><span>знижка до 20%</span></div>
     </div>
     <div class="pl-card">
       <h3>Таблички та шильди</h3>
-      <div class="pl-row"><span>Акрил стандарт</span><span>від 400 грн/шт</span></div>
+      <div class="pl-row"><span>Пластик / Акрил стандарт</span><span>від 400 грн/шт</span></div>
       <div class="pl-row"><span>Алюміній</span><span>від 500 грн/шт</span></div>
       <div class="pl-row"><span>Нерж. сталь / латунь</span><span>від 800 грн/шт</span></div>
       <div class="pl-row"><span>Тираж 10+ шт</span><span>ціна знижується</span></div>
@@ -440,7 +445,7 @@ footer span{color:#cc0000}
     <div class="coeff-card">
       <h3>Матеріал K3</h3>
       <div class="coeff-row"><span>Фанера</span><span>×1.0</span></div>
-      <div class="coeff-row"><span>Акрил</span><span>×1.2</span></div>
+      <div class="coeff-row"><span>Пластик / Акрил</span><span>×1.2</span></div>
       <div class="coeff-row"><span>Гума / флеш</span><span>×1.3</span></div>
       <div class="coeff-row"><span>Алюміній</span><span>×1.5</span></div>
       <div class="coeff-row"><span>Гума / Силікон / Софт-тач</span><span>×1.8</span></div>
@@ -710,6 +715,13 @@ function calcPrice(){
     '<div class="result-row"><span class="rl">Розрахункова сума</span><span class="rv">'+Math.round(total)+' грн</span></div>';
 
   document.getElementById('final-price').innerHTML=Math.round(finalPrice).toLocaleString('uk-UA')+' <span>грн</span>';
+  var perUnit=qty>0?Math.round(finalPrice/qty):Math.round(finalPrice);
+  var detail=document.getElementById('price-card-detail');
+  if(qty>1){
+    detail.textContent=qty+' шт × '+perUnit.toLocaleString('uk-UA')+' грн/шт';
+  } else {
+    detail.textContent='';
+  }
   document.getElementById('min-note').textContent=wasMin?'* Застосовано мінімальний чек 400 грн':'';
 
   var ub=document.getElementById('upsell-box');
@@ -734,6 +746,60 @@ updateUrgency();
 updateWorkType();
 document.getElementById('footer-year').textContent=new Date().getFullYear();
 document.getElementById('signArea').value=(200.0).toFixed(1);
+
+// html2canvas для скачування
+var script=document.createElement('script');
+script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+document.head.appendChild(script);
+
+function downloadPriceCard(){
+  var card=document.getElementById('price-card');
+  var btn=document.getElementById('download-btn');
+  btn.textContent='Зберігаємо...';
+
+  // Тимчасово розширюємо карточку для гарного PNG
+  var wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;top:-9999px;left:-9999px;background:#fff;padding:32px 40px;border-radius:12px;border:2px solid #cc0000;min-width:420px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
+
+  var logo='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #cc0000">'
+    +'<div style="font-size:13px;font-weight:800;color:#1a1a1a;letter-spacing:1px">PROGRAVER.UA</div>'
+    +'<div style="font-size:12px;color:#999;margin-left:8px">Калькулятор вартості</div></div>';
+
+  var wt=document.getElementById('workType');
+  var workName=wt.options[wt.selectedIndex].text;
+  var qty=parseInt(document.getElementById('qty').value)||1;
+  var finalVal=document.getElementById('final-price').textContent.replace(' грн','').trim();
+  var finalNum=parseInt(finalVal.replace(/\s/g,''))||0;
+  var perUnit=qty>0?Math.round(finalNum/qty):finalNum;
+  var detail=qty>1
+    ? qty+' шт × '+perUnit.toLocaleString('uk-UA')+' грн = '+finalNum.toLocaleString('uk-UA')+' грн'
+    : '1 шт = '+finalNum.toLocaleString('uk-UA')+' грн';
+
+  var date=new Date().toLocaleDateString('uk-UA');
+
+  wrap.innerHTML=logo
+    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Послуга</div>'
+    +'<div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:16px">'+workName+'</div>'
+    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Розрахунок</div>'
+    +'<div style="font-size:14px;color:#555;margin-bottom:16px">'+detail+'</div>'
+    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Вартість замовлення</div>'
+    +'<div style="font-size:44px;font-weight:800;color:#1a1a1a;letter-spacing:-1px">'+finalNum.toLocaleString('uk-UA')+' <span style="font-size:22px;font-weight:600;color:#888">грн</span></div>'
+    +'<div style="font-size:11px;color:#bbb;margin-top:20px;padding-top:12px;border-top:1px solid #eee">Розраховано '+date+' · prograver.com.ua</div>';
+
+  document.body.appendChild(wrap);
+
+  html2canvas(wrap,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(canvas){
+    document.body.removeChild(wrap);
+    var link=document.createElement('a');
+    link.download='prograver-price-'+Date.now()+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Зберегти як зображення';
+  }).catch(function(){
+    document.body.removeChild(wrap);
+    btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Зберегти як зображення';
+  });
+}
 </script>
 </body>
 </html>
