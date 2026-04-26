@@ -359,6 +359,10 @@ footer span{color:#cc0000}
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Зберегти як зображення
         </button>
+        <button onclick="copyPriceCard()" id="copy-btn" style="margin-top:8px;width:100%;padding:10px;background:#fff;color:#cc0000;border:2px solid #cc0000;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Копіювати в буфер (Ctrl+V)
+        </button>
         <div class="upsell-box" id="upsell-box" style="display:none"></div>
       </div>
     </div>
@@ -752,42 +756,52 @@ var script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
 document.head.appendChild(script);
 
-function downloadPriceCard(){
-  var card=document.getElementById('price-card');
-  var btn=document.getElementById('download-btn');
-  btn.textContent='Зберігаємо...';
-
-  // Тимчасово розширюємо карточку для гарного PNG
+function buildPriceWrap(){
   var wrap=document.createElement('div');
-  wrap.style.cssText='position:fixed;top:-9999px;left:-9999px;background:#fff;padding:32px 40px;border-radius:12px;border:2px solid #cc0000;min-width:420px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
+  wrap.style.cssText='position:fixed;top:-9999px;left:-9999px;background:#fff;padding:32px 40px;border-radius:12px;border:2px solid #cc0000;min-width:420px;max-width:480px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
 
-  var logo='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #cc0000">'
-    +'<div style="font-size:13px;font-weight:800;color:#1a1a1a;letter-spacing:1px">PROGRAVER.UA</div>'
-    +'<div style="font-size:12px;color:#999;margin-left:8px">Калькулятор вартості</div></div>';
+  var logo='<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #cc0000">'
+    +'<div style="font-size:14px;font-weight:800;color:#1a1a1a;letter-spacing:1px">PROGRAVER.UA</div>'
+    +'<div style="font-size:12px;color:#999;margin-left:8px">Розрахунок вартості</div></div>';
 
   var wt=document.getElementById('workType');
   var workName=wt.options[wt.selectedIndex].text;
   var qty=parseInt(document.getElementById('qty').value)||1;
-  var finalVal=document.getElementById('final-price').textContent.replace(' грн','').trim();
-  var finalNum=parseInt(finalVal.replace(/\s/g,''))||0;
+  var finalVal=document.getElementById('final-price').textContent.replace('грн','').trim();
+  var finalNum=parseInt(finalVal.replace(/\s/g,'').replace(/\u00a0/g,''))||0;
   var perUnit=qty>0?Math.round(finalNum/qty):finalNum;
-  var detail=qty>1
+  var calcLine=qty>1
     ? qty+' шт × '+perUnit.toLocaleString('uk-UA')+' грн = '+finalNum.toLocaleString('uk-UA')+' грн'
     : '1 шт = '+finalNum.toLocaleString('uk-UA')+' грн';
-
   var date=new Date().toLocaleDateString('uk-UA');
+  var sampleBlock='<div style="padding-top:14px;border-top:1px solid #eee;margin-top:4px">'
+    +'<div style="font-size:13px;color:#333;margin-bottom:'+(qty>=6?'6px':'0')+'">'
+    +'Вартість виготовлення зразка: <strong>400 грн</strong></div>';
+  if(qty>=6){
+    sampleBlock+='<div style="font-size:12px;color:#888;line-height:1.6">'
+      +'При надходженні партії в роботу, після виготовлення зразка, '
+      +'вартість зразка враховується у загальну вартість партії.</div>';
+  }
+  sampleBlock+='</div>';
 
   wrap.innerHTML=logo
-    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Послуга</div>'
-    +'<div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:16px">'+workName+'</div>'
-    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Розрахунок</div>'
-    +'<div style="font-size:14px;color:#555;margin-bottom:16px">'+detail+'</div>'
-    +'<div style="font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Вартість замовлення</div>'
-    +'<div style="font-size:44px;font-weight:800;color:#1a1a1a;letter-spacing:-1px">'+finalNum.toLocaleString('uk-UA')+' <span style="font-size:22px;font-weight:600;color:#888">грн</span></div>'
-    +'<div style="font-size:11px;color:#bbb;margin-top:20px;padding-top:12px;border-top:1px solid #eee">Розраховано '+date+' · prograver.com.ua</div>';
+    +'<div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Послуга</div>'
+    +'<div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:14px">'+workName+'</div>'
+    +'<div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Розрахунок</div>'
+    +'<div style="font-size:14px;color:#555;margin-bottom:14px">'+calcLine+'</div>'
+    +'<div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Вартість замовлення</div>'
+    +'<div style="font-size:44px;font-weight:800;color:#1a1a1a;letter-spacing:-1px;margin-bottom:16px">'+finalNum.toLocaleString('uk-UA')+' <span style="font-size:22px;font-weight:600;color:#888">грн</span></div>'
+    +sampleBlock
+    +'<div style="font-size:11px;color:#bbb;margin-top:14px">Розраховано '+date+'</div>';
 
+  return wrap;
+}
+
+function downloadPriceCard(){
+  var btn=document.getElementById('download-btn');
+  btn.textContent='Зберігаємо...';
+  var wrap=buildPriceWrap();
   document.body.appendChild(wrap);
-
   html2canvas(wrap,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(canvas){
     document.body.removeChild(wrap);
     var link=document.createElement('a');
@@ -800,6 +814,37 @@ function downloadPriceCard(){
     btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Зберегти як зображення';
   });
 }
+
+function copyPriceCard(){
+  var btn=document.getElementById('copy-btn');
+  btn.textContent='Копіюємо...';
+  var wrap=buildPriceWrap();
+  document.body.appendChild(wrap);
+  html2canvas(wrap,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(canvas){
+    document.body.removeChild(wrap);
+    canvas.toBlob(function(blob){
+      try{
+        navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){
+          btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Скопійовано!';
+          setTimeout(function(){
+            btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати в буфер (Ctrl+V)';
+          },3000);
+        }).catch(function(){
+          btn.innerHTML='⚠ Не вдалось — спробуйте "Зберегти"';
+          setTimeout(function(){btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати в буфер (Ctrl+V)';},3000);
+        });
+      }catch(e){
+        btn.innerHTML='⚠ Браузер не підтримує — спробуйте Chrome';
+        setTimeout(function(){btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати в буфер (Ctrl+V)';},3000);
+      }
+    },'image/png');
+  }).catch(function(){
+    document.body.removeChild(wrap);
+    btn.innerHTML='⚠ Помилка — спробуйте ще раз';
+    setTimeout(function(){btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати в буфер (Ctrl+V)';},3000);
+  });
+}
+
 </script>
 </body>
 </html>
