@@ -702,8 +702,9 @@ function calcPrice(){
   var engraveInfo='';
   if(wt==='engrave'){
     var minsVal=parseFloat(document.getElementById('minutes').value)||0;
+    var hours=(totalMins/60).toFixed(1);
     var rotaryLabel=rotary?' + ротатор (×1.5 час, ×1.4 ціна)':'';
-    engraveInfo='<div class="result-row"><span class="rl">Загальний час'+rotaryLabel+'</span><span class="rv">'+totalMins+' хв</span></div>';
+    engraveInfo='<div class="result-row"><span class="rl">Загальний час'+rotaryLabel+'</span><span class="rv">'+totalMins+' хв ('+hours+' год)</span></div>';
   }
   rows.innerHTML=
     engraveInfo+
