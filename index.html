@@ -112,7 +112,7 @@ footer span{color:#cc0000}
 <div class="tabs">
   <button class="tab active" onclick="showTab('calc',this)">Калькулятор</button>
   <button class="tab" onclick="showTab('pricelist',this)">Прайс-лист</button>
-  <button class="tab" onclick="showTab('coeffs',this)">Коефіцієнти</button>
+  
   <button class="tab" onclick="showTab('scripts',this)">Скрипти</button>
 </div>
 
@@ -436,59 +436,6 @@ footer span{color:#cc0000}
   </div>
 </div>
 
-<!-- ===== КОЕФІЦІЄНТИ ===== -->
-<div id="tab-coeffs" class="section">
-  <div class="coeff-grid">
-    <div class="coeff-card">
-      <h3>Складність K1</h3>
-      <div class="coeff-row"><span>Проста</span><span>×1.0</span></div>
-      <div class="coeff-row"><span>Середня</span><span>×1.3</span></div>
-      <div class="coeff-row"><span>Складна</span><span>×1.6</span></div>
-      <div class="coeff-row"><span>Дуже складна</span><span>×2.0</span></div>
-    </div>
-    <div class="coeff-card">
-      <h3>Знижка тиражу K2</h3>
-      <div class="coeff-row"><span>1 шт</span><span>−0%</span></div>
-      <div class="coeff-row"><span>2–5 шт</span><span>−10%</span></div>
-      <div class="coeff-row"><span>6–10 шт</span><span>−15%</span></div>
-      <div class="coeff-row"><span>11–25 шт</span><span>−20%</span></div>
-      <div class="coeff-row"><span>26–50 шт</span><span>−30%</span></div>
-      <div class="coeff-row"><span>51–100 шт</span><span>−40%</span></div>
-      <div class="coeff-row"><span>100+ шт</span><span>−50%</span></div>
-    </div>
-    <div class="coeff-card">
-      <h3>Матеріал K3</h3>
-      <div class="coeff-row"><span>Фанера</span><span>×1.0</span></div>
-      <div class="coeff-row"><span>Пластик / Акрил</span><span>×1.2</span></div>
-      <div class="coeff-row"><span>Гума / флеш</span><span>×1.3</span></div>
-      <div class="coeff-row"><span>Алюміній</span><span>×1.5</span></div>
-      <div class="coeff-row"><span>Гума / Силікон / Софт-тач</span><span>×1.8</span></div>
-      <div class="coeff-row"><span>Метал / Нерж. сталь / Скло</span><span>×2.0</span></div>
-      <div class="coeff-row"><span>Латунь / бронза</span><span>×2.5</span></div>
-      <div class="coeff-row"><span>Золото / Срібло</span><span>×3.0</span></div>
-    </div>
-    <div class="coeff-card">
-      <h3>Терміновість K4</h3>
-      <div class="coeff-row"><span>Стандарт (1 шт)</span><span>×1.0</span></div>
-      <div class="coeff-row"><span>Терміново (1 шт)</span><span>×2.0</span></div>
-      <div class="coeff-row"><span>До 3 днів (2+ шт)</span><span>×1.0</span></div>
-      <div class="coeff-row"><span>На завтра (2+ шт)</span><span>×2.0</span></div>
-    </div>
-    <div class="coeff-card">
-      <h3>Тип клієнта K5</h3>
-      <div class="coeff-row"><span>Новий</span><span>×1.2</span></div>
-      <div class="coeff-row"><span>Постійний</span><span>×1.0</span></div>
-    </div>
-    <div class="coeff-card">
-      <h3>Формула</h3>
-      <div class="formula-box">
-        БАЗА × K1 × K2 × K3<br>× K4 × K5 + доплати<br>
-        <span style="color:#cc0000">≥ мін. чек 400 грн</span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ===== СКРИПТИ ===== -->
 <div id="tab-scripts" class="section">
   <div class="scripts-list">
@@ -566,7 +513,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 11.05.2026 23:55</span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 12.05.2026 00:26</span>
 </footer>
 
 <script>
