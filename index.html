@@ -681,24 +681,14 @@ function calcPrice(){
 
     var totalAreaCm2=areaCm2*qty; // загальна площа замовлення
 
-    // Шкала матеріалу (множник до собівартості) по загальній площі
-    var matMult;
-    if(totalAreaCm2<=30)       matMult=5.0;
-    else if(totalAreaCm2<=100) matMult=4.0;
-    else if(totalAreaCm2<=300) matMult=2.5;
-    else if(totalAreaCm2<=600) matMult=2.5;
-    else if(totalAreaCm2<=1000)matMult=2.0;
-    else                       matMult=1.5;
-
-    // Шкала ставки роботи по загальній площі (мала/велика табличка)
-    var isSmall=areaCm2<155;
-    var autoWorkRate;
-    if(totalAreaCm2<=30)       autoWorkRate=isSmall?10.0:6.0;
-    else if(totalAreaCm2<=100) autoWorkRate=isSmall?8.0:5.0;
-    else if(totalAreaCm2<=300) autoWorkRate=isSmall?3.5:2.5;
-    else if(totalAreaCm2<=600) autoWorkRate=isSmall?4.0:3.0;
-    else if(totalAreaCm2<=1000)autoWorkRate=isSmall?3.0:2.5;
-    else                       autoWorkRate=isSmall?2.5:2.0;
+    // Шкала по загальній площі (матеріал і робота в одному блоці нижче)
+    var matMult, autoWorkRate;
+    if(totalAreaCm2<=30)        { matMult=5.0; autoWorkRate=isSmall?10.0:6.0; }
+    else if(totalAreaCm2<=100)  { matMult=4.0; autoWorkRate=isSmall?8.0:5.0; }
+    else if(totalAreaCm2<=350)  { matMult=2.5; autoWorkRate=isSmall?3.5:2.5; }
+    else if(totalAreaCm2<=700)  { matMult=2.0; autoWorkRate=isSmall?3.0:2.0; }
+    else if(totalAreaCm2<=1200) { matMult=1.8; autoWorkRate=isSmall?2.5:1.8; }
+    else                        { matMult=1.5; autoWorkRate=isSmall?2.0:1.5; }
 
     document.getElementById('signWorkRate').value=autoWorkRate.toFixed(2);
 
