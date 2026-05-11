@@ -566,7 +566,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 11.05.2026 14:30</span>
 </footer>
 
 <script>
@@ -682,6 +682,7 @@ function calcPrice(){
     var totalAreaCm2=areaCm2*qty; // загальна площа замовлення
 
     // Шкала по загальній площі (матеріал і робота в одному блоці нижче)
+    var isSmall=areaCm2<155;
     var matMult, autoWorkRate;
     if(totalAreaCm2<=30)        { matMult=5.0; autoWorkRate=isSmall?10.0:6.0; }
     else if(totalAreaCm2<=100)  { matMult=4.0; autoWorkRate=isSmall?8.0:5.0; }
