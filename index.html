@@ -678,24 +678,47 @@ function calcPrice(){
     var sh=parseFloat(document.getElementById('signH').value)||0;
     var areaCm2=Math.round(sw*sh/100*10)/10;
     document.getElementById('signArea').value=areaCm2.toFixed(1);
-    // Автоматична ставка: до 155 см² (А6) = 10 грн/см², від 155 см² = 6 грн/см²
-    var autoWorkRate=areaCm2<155?10:6;
+
+    var totalAreaCm2=areaCm2*qty; // загальна площа замовлення
+
+    // Шкала матеріалу (множник до собівартості) по загальній площі
+    var matMult;
+    if(totalAreaCm2<=30)       matMult=5.0;
+    else if(totalAreaCm2<=100) matMult=4.0;
+    else if(totalAreaCm2<=300) matMult=2.5;
+    else if(totalAreaCm2<=600) matMult=2.5;
+    else if(totalAreaCm2<=1000)matMult=2.0;
+    else                       matMult=1.5;
+
+    // Шкала ставки роботи по загальній площі (мала/велика табличка)
+    var isSmall=areaCm2<155;
+    var autoWorkRate;
+    if(totalAreaCm2<=30)       autoWorkRate=isSmall?10.0:6.0;
+    else if(totalAreaCm2<=100) autoWorkRate=isSmall?8.0:5.0;
+    else if(totalAreaCm2<=300) autoWorkRate=isSmall?3.5:2.5;
+    else if(totalAreaCm2<=600) autoWorkRate=isSmall?4.0:3.0;
+    else if(totalAreaCm2<=1000)autoWorkRate=isSmall?3.0:2.5;
+    else                       autoWorkRate=isSmall?2.5:2.0;
+
     document.getElementById('signWorkRate').value=autoWorkRate.toFixed(2);
+
     var signMatRate=parseFloat(document.getElementById('signMatRate').value)||0.40;
-    var signMatRateSell=signMatRate*5; // продажна ціна = собівартість × 5
-    var signWorkRate=autoWorkRate;
+    var signMatRateSell=signMatRate*matMult;
     var adhesive=document.getElementById('adhesive').checked;
     var adhesiveRate=adhesive?0.15:0;
-    var totalRate=signMatRateSell+signWorkRate+adhesiveRate;
+    var totalRate=signMatRateSell+autoWorkRate+adhesiveRate;
     var perUnit=areaCm2*totalRate;
     base=perUnit*qty;
     mat=1.0;
-    var rateTierLabel=areaCm2<155?' · мала (< А6) → '+autoWorkRate+' грн/см²':' · велика (≥ А6) → '+autoWorkRate+' грн/см²';
+
+    var sizeLabel=isSmall?' мала (< А6)':' велика (≥ А6)';
     var hint=document.getElementById('sign-calc-hint');
-    hint.textContent='Площа: '+areaCm2.toFixed(1)+' см²'+rateTierLabel
-      +' · Матеріал (×5): '+Math.round(areaCm2*signMatRateSell)+' грн'
-      +' · Робота: '+Math.round(areaCm2*signWorkRate)+' грн'
-      +(adhesive?' · Клейка: '+Math.round(areaCm2*adhesiveRate)+' грн':'')
+    hint.textContent='Площа 1 шт: '+areaCm2.toFixed(1)+' см²'
+      +' · Загальна: '+totalAreaCm2.toFixed(1)+' см²'
+      +sizeLabel
+      +' · Матеріал (×'+matMult+'): '+Math.round(areaCm2*signMatRateSell)+' грн/шт'
+      +' · Робота ('+autoWorkRate+' грн/см²): '+Math.round(areaCm2*autoWorkRate)+' грн/шт'
+      +(adhesive?' · Клейка: '+Math.round(areaCm2*adhesiveRate)+' грн/шт':'')
       +' · За 1 шт: '+Math.round(perUnit)+' грн'
       +(qty>1?' · За '+qty+' шт: '+Math.round(perUnit*qty)+' грн':'');
   } else if(wt==='stamp'){
