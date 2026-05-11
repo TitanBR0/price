@@ -736,7 +736,9 @@ function calcPrice(){
     mat=1.0;
   }
 
-  var subtotal=base*k1*k2*mat*k4*k5;
+  // Для табличок K2 не застосовується — знижка вже врахована через загальну площу
+  var effectiveK2 = (wt==='sign') ? 1.0 : k2;
+  var subtotal=base*k1*effectiveK2*mat*k4*k5;
   var extras=design;
   var total=subtotal+extras;
   var finalPrice=Math.max(total,MIN_PRICE);
@@ -755,7 +757,7 @@ function calcPrice(){
     engraveInfo+
     '<div class="result-row"><span class="rl">База розрахунку</span><span class="rv">'+Math.round(base)+' грн</span></div>'+
     '<div class="result-row"><span class="rl">Складність K1 (×'+k1+')</span><span class="rv"></span></div>'+
-    '<div class="result-row"><span class="rl">Знижка тиражу K2 ('+qtyLabel(effectiveQty)+(uniqueLayouts>1?', '+uniqueLayouts+' макет(и)':'')+')</span><span class="rv"></span></div>'+
+    (wt!=='sign'?'<div class="result-row"><span class="rl">Знижка тиражу K2 ('+qtyLabel(effectiveQty)+(uniqueLayouts>1?', '+uniqueLayouts+' макет(и)':'')+')</span><span class="rv"></span></div>':'')+
     (wt!=='uv'?'<div class="result-row"><span class="rl">Матеріал K3 (×'+mat+')</span><span class="rv"></span></div>':'')+
     '<div class="result-row"><span class="rl">Терміновість K4 (×'+k4+')</span><span class="rv"></span></div>'+
     '<div class="result-row"><span class="rl">Клієнт K5 (×'+k5+')</span><span class="rv">= '+Math.round(subtotal)+' грн</span></div>'+
