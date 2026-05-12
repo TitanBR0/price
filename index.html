@@ -430,8 +430,10 @@ footer span{color:#cc0000}
       <div class="pl-row"><span>Готовий файл клієнта</span><span>100 грн</span></div>
       <div class="pl-row"><span>Простий дизайн</span><span>200–300 грн</span></div>
       <div class="pl-row"><span>Складний дизайн</span><span>500–1 000 грн</span></div>
-      <div class="pl-row"><span>1 шт — терміново (сьогодні)</span><span>+100%</span></div>
-      <div class="pl-row"><span>2+ шт — на завтра</span><span>+100%</span></div>
+      <div class="pl-row"><span>Стандарт (6+ днів)</span><span>базова ціна</span></div>
+      <div class="pl-row"><span>3–5 днів</span><span>+25%</span></div>
+      <div class="pl-row"><span>До 3 днів</span><span>+50%</span></div>
+      <div class="pl-row"><span>На завтра</span><span>+100%</span></div>
     </div>
   </div>
 </div>
@@ -469,7 +471,7 @@ footer span{color:#cc0000}
     </div>
     <div class="script-card">
       <div class="script-tag tag-c">Закриття угоди</div>
-      <div class="script-text">"Є два варіанти: стандартний — 3–5 днів, і терміновий — до завтра з доплатою 100%. Який зручніший?"</div>
+      <div class="script-text">"Є кілька варіантів по терміну: стандарт — 6+ днів (базова ціна), 3–5 днів (+25%), до 3 днів (+50%), на завтра (+100%). Який підходить?"</div>
     </div>
     <div class="script-card">
       <div class="script-tag tag-c">Якщо дорого</div>
@@ -513,7 +515,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 12.05.2026 00:26</span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 12.05.2026 07:44</span>
 </footer>
 
 <script>
@@ -552,8 +554,8 @@ function updateUrgency(){
   var sel=document.getElementById('urgency');
   var cur=sel.value;
   sel.innerHTML=qty<=1
-    ?'<option value="1.0">Стандарт (×1.0)</option><option value="2.0">Терміново (×2.0)</option>'
-    :'<option value="1.0">До 3 днів — стандарт (×1.0)</option><option value="2.0">На завтра — терміново (×2.0)</option>';
+    ?'<option value="1.0">Стандарт (×1.0)</option><option value="1.25">3–5 днів (+25%)</option><option value="1.5">До 3 днів (+50%)</option><option value="2.0">На завтра (+100%)</option>'
+    :'<option value="1.0">Стандарт (×1.0)</option><option value="1.25">3–5 днів (+25%)</option><option value="1.5">До 3 днів (+50%)</option><option value="2.0">На завтра (+100%)</option>';
   sel.value=(cur==='2.0')?'2.0':'1.0';
   calcPrice();
 }
@@ -717,7 +719,7 @@ function calcPrice(){
   var ub=document.getElementById('upsell-box');
   var tips=[];
   if(qty<5) tips.push(['Замовте 5 шт — ціна за шт значно нижче','']);
-  if(k4<2.0) tips.push(['Терміново (на завтра / сьогодні)','+100%']);
+  if(k4<2.0) tips.push(['Терміново (на завтра)','+100%']);
   if(design<200) tips.push(['Додати дизайн','+200 грн']);
   if(mat<1.5&&wt!=='stamp'&&wt!=='uv') tips.push(['Upgrade матеріал до металу','ціна ×1.5']);
   if(wt==='stamp'&&parseInt(document.getElementById('stampBase').value)<280) tips.push(['Преміум оснастка для штампу','+100–170 грн']);
