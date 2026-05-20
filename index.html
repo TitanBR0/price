@@ -192,18 +192,30 @@ footer span{color:#cc0000}
           <div id="engrave-type-hint" style="font-size:12px;color:#555;background:#fff8f8;border:1px solid #f0d0d0;border-left:3px solid #cc0000;border-radius:6px;padding:8px 12px;margin-bottom:12px"></div>
 
           <!-- Розмір зони гравірування -->
-          <div class="grid3">
-            <div class="field">
-              <label>Ширина зони (мм)</label>
-              <input type="number" id="engraveW" value="30" min="1" oninput="calcEngraveTime()">
+          <div style="margin-bottom:12px">
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <button id="mode-dims" onclick="setEngraveMode('dims')" style="flex:1;padding:7px;font-size:12px;font-weight:700;border-radius:6px;cursor:pointer;border:2px solid #cc0000;background:#cc0000;color:#fff;outline:none">Ширина × Висота</button>
+              <button id="mode-area" onclick="setEngraveMode('area')" style="flex:1;padding:7px;font-size:12px;font-weight:700;border-radius:6px;cursor:pointer;border:2px solid #cc0000;background:#fff;color:#cc0000;outline:none">Пряма площа (см²)</button>
             </div>
-            <div class="field">
-              <label>Висота зони (мм)</label>
-              <input type="number" id="engraveH" value="20" min="1" oninput="calcEngraveTime()">
+            <div class="grid3" id="dims-row">
+              <div class="field">
+                <label>Ширина (мм)</label>
+                <input type="number" id="engraveW" value="30" min="1" oninput="calcEngraveTime()">
+              </div>
+              <div class="field">
+                <label>Висота (мм)</label>
+                <input type="number" id="engraveH" value="20" min="1" oninput="calcEngraveTime()">
+              </div>
+              <div class="field">
+                <label>Площа (см²)</label>
+                <input type="number" id="engraveArea" readonly style="background:#f0f0f0;color:#888;cursor:default" value="6.0">
+              </div>
             </div>
-            <div class="field">
-              <label>Площа (см²)</label>
-              <input type="number" id="engraveArea" readonly style="background:#f0f0f0;color:#888;cursor:default">
+            <div id="direct-area-row" style="display:none">
+              <div class="field">
+                <label>Площа гравірування (см²)</label>
+                <input type="number" id="engraveAreaDirect" value="6.0" min="0.1" step="0.1" oninput="calcEngraveTime()">
+              </div>
             </div>
           </div>
 
@@ -631,6 +643,20 @@ var LASER_SPEEDS = {
   }
 };
 
+var engraveMode = 'dims'; // 'dims' або 'area'
+
+function setEngraveMode(mode){
+  engraveMode = mode;
+  var isDims = mode==='dims';
+  document.getElementById('dims-row').style.display = isDims ? '' : 'none';
+  document.getElementById('direct-area-row').style.display = isDims ? 'none' : '';
+  document.getElementById('mode-dims').style.background = isDims ? '#cc0000' : '#fff';
+  document.getElementById('mode-dims').style.color = isDims ? '#fff' : '#cc0000';
+  document.getElementById('mode-area').style.background = isDims ? '#fff' : '#cc0000';
+  document.getElementById('mode-area').style.color = isDims ? '#cc0000' : '#fff';
+  calcEngraveTime();
+}
+
 function updateEngraveRates(){
   var laser=document.getElementById('laserType').value;
   var type=document.getElementById('engraveType').value;
@@ -649,14 +675,22 @@ function updateEngraveRates(){
 }
 
 function calcEngraveTime(){
-  var w=parseFloat(document.getElementById('engraveW').value)||0;
-  var h=parseFloat(document.getElementById('engraveH').value)||0;
   var type=document.getElementById('engraveType').value;
   var speed=parseFloat(document.getElementById('laserSpeed').value)||150;
   var density=parseFloat(document.getElementById('engraveDensity').value)||0.6;
 
-  var areaCm2=Math.round(w*h/100*10)/10;
-  document.getElementById('engraveArea').value=areaCm2.toFixed(1);
+  var w, h, areaCm2;
+  if(engraveMode==='area'){
+    areaCm2=parseFloat(document.getElementById('engraveAreaDirect').value)||0;
+    // Апроксимуємо як квадрат для розрахунку периметру
+    w=Math.sqrt(areaCm2*100);
+    h=w;
+  } else {
+    w=parseFloat(document.getElementById('engraveW').value)||0;
+    h=parseFloat(document.getElementById('engraveH').value)||0;
+    areaCm2=Math.round(w*h/100*10)/10;
+    document.getElementById('engraveArea').value=areaCm2.toFixed(1);
+  }
 
   // Розрахунок часу в секундах
   var timeSec=0;
@@ -877,6 +911,7 @@ function calcPrice(){
 updateUrgency();
 updateWorkType();
 updateEngraveRates();
+setEngraveMode('dims');
 document.getElementById('footer-year').textContent=new Date().getFullYear();
 document.getElementById('signArea').value=(200.0).toFixed(1);
 
