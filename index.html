@@ -679,10 +679,12 @@ function calcEngraveTime(){
   var speed=parseFloat(document.getElementById('laserSpeed').value)||150;
   var density=parseFloat(document.getElementById('engraveDensity').value)||0.6;
 
+  // Визначаємо режим по видимості блоків
+  var isDirect = document.getElementById('direct-area-row').style.display !== 'none';
+
   var w, h, areaCm2;
-  if(engraveMode==='area'){
+  if(isDirect){
     areaCm2=parseFloat(document.getElementById('engraveAreaDirect').value)||0;
-    // Апроксимуємо як квадрат для розрахунку периметру
     w=Math.sqrt(areaCm2*100);
     h=w;
   } else {
