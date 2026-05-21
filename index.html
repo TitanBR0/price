@@ -137,6 +137,7 @@ footer span{color:#cc0000}
             <label>Матеріал</label>
             <select id="material" onchange="calcPrice()">
               <option value="1.0">Фанера / дерево (×1.0)</option>
+              <option value="0.8">Картон (×0.8)</option>
               <option value="1.2">Пластик / Акрил (×1.2)</option>
               <option value="1.5">Алюміній (×1.5)</option>
               <option value="2.0">Метал / Нерж. сталь (×2.0)</option>
@@ -175,6 +176,7 @@ footer span{color:#cc0000}
               <label>Тип лазера</label>
               <select id="laserType" onchange="updateEngraveRates()">
                 <option value="co2">CO2 (дерево, акрил, скло, шкіра)</option>
+                <option value="co2cardboard">CO2 — Картон</option>
                 <option value="fiber">Fiber (метал, нержавійка, латунь)</option>
               </select>
             </div>
@@ -466,6 +468,7 @@ footer span{color:#cc0000}
     <div class="pl-card">
       <h3>Лазерна різка</h3>
       <div class="pl-row"><span>Фанера (за метр різу)</span><span>від 20 грн/м</span></div>
+      <div class="pl-row"><span>Картон (за метр різу)</span><span>від 15 грн/м</span></div>
       <div class="pl-row"><span>Пластик / Акрил (за метр різу)</span><span>від 24 грн/м</span></div>
       <div class="pl-row"><span>Мінімальне замовлення</span><span>від 400 грн</span></div>
       <div class="pl-row"><span>Тираж 50+ шт</span><span>знижка до 20%</span></div>
@@ -584,7 +587,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 12.05.2026 10:15</span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 21.05.2026 15:10</span>
 </footer>
 
 <script>
@@ -636,6 +639,11 @@ var LASER_SPEEDS = {
     fill:    { default: 120, hint: 'Заливка: лазер заштриховує всю площу рядок за рядком, як принтер. Підходить для суцільних логотипів, фото-гравірування.' },
     mixed:   { default: 150, hint: 'Змішане: є і контури і заливка. Наприклад текст + заповнений фон, або логотип з тінню.' }
   },
+  co2cardboard: {
+    contour: { default: 250, hint: 'Контур: лазер малює тільки лінії і обводку. Підходить для тексту, монограм, простих логотипів.' },
+    fill:    { default: 180, hint: 'Заливка: лазер заштриховує всю площу рядок за рядком. Картон гравірується швидше ніж дерево.' },
+    mixed:   { default: 200, hint: 'Змішане: є і контури і заливка. Наприклад текст + заповнений фон, або логотип з тінню.' }
+  },
   fiber: {
     contour: { default: 400, hint: 'Контур: лазер малює тільки лінії і обводку. Підходить для тексту, монограм, простих логотипів.' },
     fill:    { default: 250, hint: 'Заливка: лазер заштриховує всю площу рядок за рядком. Підходить для суцільних логотипів, маркування.' },
@@ -660,7 +668,13 @@ function setEngraveMode(mode){
 function updateEngraveRates(){
   var laser=document.getElementById('laserType').value;
   var type=document.getElementById('engraveType').value;
-  var speeds=LASER_SPEEDS[laser][type];
+  var laserKey=laser==='co2cardboard'?'co2cardboard':laser;
+  var speeds=LASER_SPEEDS[laserKey][type];
+
+  // Автоматично ставимо матеріал для картону
+  if(laser==='co2cardboard'){
+    document.getElementById('material').value='0.8';
+  }
 
   // Оновлюємо швидкість
   document.getElementById('laserSpeed').value=speeds.default;
