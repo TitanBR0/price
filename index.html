@@ -638,7 +638,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 21.05.2026 21:28</span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 22.05.2026 07:35</span>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -871,18 +871,26 @@ function cCalc(){
   var k5 = parseFloat(document.getElementById('c-client').value)||1.0;
   var design = parseFloat(document.getElementById('c-design').value)||0;
 
-  var effectiveQty = qty/layouts;
-  var qd = getQtyDiscount(effectiveQty);
-  var k2 = qd.k;
+  // Знижка тиражу по загальних метрах різу
+  var totalMeters = meters * qty;
+  var k2, k2label;
+  if(totalMeters<=1)        { k2=1.0;  k2label='до 1 м (без знижки)'; }
+  else if(totalMeters<=5)   { k2=0.95; k2label=totalMeters.toFixed(1)+' м (−5%)'; }
+  else if(totalMeters<=15)  { k2=0.90; k2label=totalMeters.toFixed(1)+' м (−10%)'; }
+  else if(totalMeters<=30)  { k2=0.85; k2label=totalMeters.toFixed(1)+' м (−15%)'; }
+  else if(totalMeters<=60)  { k2=0.80; k2label=totalMeters.toFixed(1)+' м (−20%)'; }
+  else if(totalMeters<=100) { k2=0.75; k2label=totalMeters.toFixed(1)+' м (−25%)'; }
+  else                      { k2=0.70; k2label=totalMeters.toFixed(1)+' м (−30%)'; }
 
   var base = meters * rate * qty;
   var subtotal = base * k2 * mat * k4 * k5 + design;
 
   var rows = '';
-  rows += row('Довжина різу', meters+' м');
-  rows += row('База ('+meters+' м × '+rate+' грн × '+qty+' шт)', Math.round(base).toLocaleString('uk-UA')+' грн');
+  rows += row('Довжина різу (1 шт)', meters+' м');
+  rows += row('Загальна довжина ('+qty+' шт)', totalMeters.toFixed(2)+' м');
+  rows += row('База ('+totalMeters.toFixed(2)+' м × '+rate+' грн)', Math.round(base).toLocaleString('uk-UA')+' грн');
   rows += sep();
-  rows += rowBlank('Знижка тиражу K2 ('+qd.label+(layouts>1?', '+layouts+' макети':'')+')');
+  rows += rowBlank('Знижка тиражу K2 ('+k2label+')');
   rows += rowBlank('Матеріал K3 (×'+mat+')');
   rows += rowBlank('Терміновість K4 (×'+k4+')');
   rows += rowBlank('Тип клієнта K5 (×'+k5+')');
