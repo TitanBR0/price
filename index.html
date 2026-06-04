@@ -201,7 +201,7 @@ footer span{color:#cc0000}
 
         <div class="grid2">
           <div class="field"><label>Час на 1 шт (хв)</label><input type="number" id="e-mins" value="1" min="0.1" step="0.1" oninput="eCalc()"></div>
-          <div class="field"><label>Ставка за хвилину (грн)</label><input type="number" id="e-rate" value="15" min="1" oninput="eCalc()"></div>
+          <div class="field"><label>Ставка за хвилину (грн)</label><input type="number" id="e-rate" value="50" min="1" oninput="eCalc()"></div>
         </div>
         <input type="hidden" id="e-speed" value="400">
 
@@ -638,7 +638,7 @@ footer span{color:#cc0000}
 </div><!-- /container -->
 
 <footer>
-  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 22.05.2026 07:35</span>
+  <span>PROGRAVER.UA</span> · Внутрішній калькулятор · <span id="footer-year"></span> · <span style="color:#999;font-size:11px">оновлено 04.06.2026 16:10</span>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -767,7 +767,7 @@ function eCalcTime(){
   } else {
     timeSec = (2*(w+h)/spd + (w*h/0.1*density)/spd)/2;
   }
-  timeSec += 30;
+  timeSec += 5;
   var minsExact = Math.max(timeSec/60, 0.5);
   document.getElementById('e-mins').value = minsExact.toFixed(2);
   document.getElementById('e-time-hint').textContent =
@@ -781,7 +781,7 @@ function eUpdateUrgency(){
 
 function eCalc(){
   var mins = parseFloat(document.getElementById('e-mins').value)||1;
-  var rate = parseFloat(document.getElementById('e-rate').value)||15;
+  var rate = parseFloat(document.getElementById('e-rate').value)||50;
   var rotary = document.getElementById('e-rotary').checked;
   var mat = parseFloat(document.getElementById('e-material').value)||1.0;
   var qty = parseInt(document.getElementById('e-qty').value)||1;
@@ -793,24 +793,30 @@ function eCalc(){
 
   var timeMult = rotary ? 1.5 : 1.0;
   var priceMult = rotary ? 1.4 : 1.0;
-  var minsPerUnit = mins * timeMult; // точне значення без округлення
-  var totalMins = Math.ceil(minsPerUnit * qty); // округлення тільки загального часу
-  var hours = (totalMins/60).toFixed(1);
 
-  var effectiveQty = qty/layouts;
-  var qd = getQtyDiscount(effectiveQty);
-  var k2 = qd.k;
+  // Точні хвилини без округлення — кожен +1 шт і +1 см² змінює ціну
+  var minsPerUnit = mins * timeMult;
+  var totalMinsExact = minsPerUnit * qty;
+  var hours = (totalMinsExact/60).toFixed(2);
 
-  var base = totalMins * rate * priceMult;
+  // Неперервна знижка тиражу: k2 = 1/qty^0.08, мін 0.5
+  var effectiveQty = qty / layouts;
+  var k2 = Math.max(0.5, 1 / Math.pow(effectiveQty, 0.08));
+  var k2pct = Math.round((1 - k2) * 100);
+  var k2label = effectiveQty <= 1
+    ? 'без знижки'
+    : effectiveQty.toFixed(1)+' шт (−'+k2pct+'%)';
+
+  var base = totalMinsExact * rate * priceMult;
   var subtotal = base * k1 * k2 * mat * k4 * k5 + design;
 
   var rows = '';
-  rows += row('Час на 1 шт'+(rotary?' (ротатор ×1.5)':''), minsPerUnit.toFixed(2)+' хв');
-  rows += row('Загальний час ('+qty+' шт)', totalMins+' хв ('+hours+' год)');
+  rows += row('Час на 1 шт'+(rotary?' (ротатор ×1.5)':''), minsPerUnit.toFixed(3)+' хв');
+  rows += row('Загальний час ('+qty+' шт)', totalMinsExact.toFixed(1)+' хв ('+hours+' год)');
   rows += row('База розрахунку', Math.round(base).toLocaleString('uk-UA')+' грн');
   rows += sep();
   rows += rowBlank('Складність K1 (×'+k1+')');
-  rows += rowBlank('Знижка тиражу K2 ('+qd.label+(layouts>1?', '+layouts+' макети':'')+')');
+  rows += rowBlank('Знижка тиражу K2 ('+k2label+(layouts>1?', '+layouts+' макети':'')+')');
   rows += rowBlank('Матеріал K3 (×'+mat+')');
   rows += rowBlank('Терміновість K4 (×'+k4+')');
   rows += rowBlank('Тип клієнта K5 (×'+k5+')');
